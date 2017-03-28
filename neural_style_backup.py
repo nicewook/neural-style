@@ -109,24 +109,18 @@ def main():
     parser = build_parser()
     options = parser.parse_args()
 
-    # VGG_PATH = 'imagenet-vgg-verydeep-19.mat' 파일을 다운받아놔야함
-    # 아마도 pre-trained weight
     if not os.path.isfile(options.network):
         parser.error("Network %s does not exist. (Did you forget to download it?)" % options.network)
 
-    # content와 style 이미지들
-    # imread() 함수로 읽어들임. 아래에 구현되어 있음
     content_image = imread(options.content)
     style_images = [imread(style) for style in options.styles]
 
-    width = options.width  # 이건 설정 해주면 아래와 같이 처리되는 것임
+    width = options.width
     if width is not None:
         new_shape = (int(math.floor(float(content_image.shape[0]) /
                 content_image.shape[1] * width)), width)
         content_image = scipy.misc.imresize(content_image, new_shape)
     target_shape = content_image.shape
-
-    # 스타일 이미지가 여러장일 경우 대비해서 for문을 돌려주고, target_shape에 맞춰주는 작업
     for i in range(len(style_images)):
         style_scale = STYLE_SCALE
         if options.style_scales is not None:
@@ -160,29 +154,27 @@ def main():
         parser.error("To save intermediate images, the checkpoint output "
                      "parameter must contain `%s` (e.g. `foo%s.jpg`)")
 
-    # 위에는 모두 사전 준비작업이고 여기서 시작
-    # stylize() 함수를 돌리는 것이다.
     for iteration, image in stylize(
-        network=options.network,    # 'imagenet-vgg-verydeep-19.mat'
-        initial=initial,            # None
-        initial_noiseblend=options.initial_noiseblend,  # 1.0
-        content=content_image,      # content 이미지
-        styles=style_images,        # sytle 이미지
-        preserve_colors=options.preserve_colors,    # content 색상 유지하고 싶을때 옵션
-        iterations=options.iterations,              # 반복횟수. default == 1000
-        content_weight=options.content_weight,      # default == 5e0
-        content_weight_blend=options.content_weight_blend,      # default == 1
-        style_weight=options.style_weight,                      # default == 5e2
-        style_layer_weight_exp=options.style_layer_weight_exp,  # default == 1
-        style_blend_weights=style_blend_weights,    # None
-        tv_weight=options.tv_weight,                # default == 1e2
-        learning_rate=options.learning_rate,        # 1e1
-        beta1=options.beta1,        # 0.9
-        beta2=options.beta2,        # 0.999
-        epsilon=options.epsilon,    # 1e-08
-        pooling=options.pooling,    # max pooling
-        print_iterations=options.print_iterations,              # None
-        checkpoint_iterations=options.checkpoint_iterations     # None
+        network=options.network,
+        initial=initial,
+        initial_noiseblend=options.initial_noiseblend,
+        content=content_image,
+        styles=style_images,
+        preserve_colors=options.preserve_colors,
+        iterations=options.iterations,
+        content_weight=options.content_weight,
+        content_weight_blend=options.content_weight_blend,
+        style_weight=options.style_weight,
+        style_layer_weight_exp=options.style_layer_weight_exp,
+        style_blend_weights=style_blend_weights,
+        tv_weight=options.tv_weight,
+        learning_rate=options.learning_rate,
+        beta1=options.beta1,
+        beta2=options.beta2,
+        epsilon=options.epsilon,
+        pooling=options.pooling,
+        print_iterations=options.print_iterations,
+        checkpoint_iterations=options.checkpoint_iterations
     ):
         output_file = None
         combined_rgb = image

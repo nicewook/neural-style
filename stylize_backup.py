@@ -25,19 +25,14 @@ def stylize(network, initial, initial_noiseblend, content, styles, preserve_colo
     """
     Stylize images.
 
-    This function yields tuples (iteration, image); `
-        - iteration` is None, if this is the final image (the last iteration).
-        - Other tuples are yielded every `checkpoint_iterations` iterations.
+    This function yields tuples (iteration, image); `iteration` is None
+    if this is the final image (the last iteration).  Other tuples are yielded
+    every `checkpoint_iterations` iterations.
 
     :rtype: iterator[tuple[int|None,image]]
     """
     shape = (1,) + content.shape
     style_shapes = [(1,) + style.shape for style in styles]
-    print("shape, content.shape, style_shapes", shape, content.shape, style_shapes)
-    '''
-    shape, content.shape, style_shapes (1, 533, 400, 3) (533, 400, 3) [(1, 316, 400, 3)]
-    '''
-
     content_features = {}
     style_features = [{} for _ in styles]
 
@@ -55,7 +50,6 @@ def stylize(network, initial, initial_noiseblend, content, styles, preserve_colo
         layer_weights_sum += style_layers_weights[style_layer]
     for style_layer in STYLE_LAYERS:
         style_layers_weights[style_layer] /= layer_weights_sum
-        #print('weight', style_layers_weights[style_layer])
 
     # compute content features in feedforward mode
     g = tf.Graph()
